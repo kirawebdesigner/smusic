@@ -22,6 +22,8 @@ import com.deniscerri.ytdl.database.models.ResultItem
 import com.deniscerri.ytdl.database.models.SearchHistoryItem
 import com.deniscerri.ytdl.database.repository.ResultRepository
 import com.deniscerri.ytdl.database.repository.SearchHistoryRepository
+import com.deniscerri.ytdl.spotify.SpotifyClient
+import com.deniscerri.ytdl.spotify.SpotifyUrlParser
 import com.deniscerri.ytdl.util.NotificationUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -192,8 +194,14 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
                     launch(Dispatchers.IO) {
                         requestSemaphore.withPermit {
                             try {
-                                val results = repository.getResultsFromSource(inputQuery, resetResults)
-                                synchronized(res) { res.addAll(results) }
+                                val queries = resolveSpotifyQueries(inputQuery)
+                                queries.forEachIndexed { index, query ->
+                                    val results = repository.getResultsFromSource(
+                                        query,
+                                        resetResults = resetResults && index == 0
+                                    )
+                                    synchronized(res) { res.addAll(results) }
+                                }
                             } catch (e: Exception) {
                                 if (e is CancellationException) throw e
                                 if (isActive) {
@@ -217,6 +225,16 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
                 notificationUtil.showQueriesFinished()
             }
         }
+    }
+
+    /**
+     * Spotify supplies metadata; yt-dlp remains responsible for locating and
+     * downloading the corresponding audio source.
+     */
+    private suspend fun resolveSpotifyQueries(inputQuery: String): List<String> {
+        val resource = SpotifyUrlParser.parse(inputQuery) ?: return listOf(inputQuery)
+        val metadata = SpotifyClient().resolve(resource)
+        return metadata.map { it.searchQuery }
     }
 
     suspend fun parseQueries(inputQueries: List<String>, onResult: (list: List<ResultItem?>) -> Unit) {

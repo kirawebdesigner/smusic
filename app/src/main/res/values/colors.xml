@@ -4,8 +4,8 @@
     <color name="black">#000000</color>
     <color name="grey">#323232</color>
     <color name="light_grey">#A6A6A6</color>
-    <color name="icon_bg">#FFFFFF</color>
-    <color name="icon_fg">#db2e2e</color>
+    <color name="icon_bg">#101318</color>
+    <color name="icon_fg">#63E6BE</color>
 
 
     <color name="blue_md_theme_light_primary">#0058CB</color>
