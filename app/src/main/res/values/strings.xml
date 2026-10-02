@@ -588,6 +588,7 @@
     <string name="burn_subs">Burn subtitles</string>
     <string name="check_clipboard_home_summary">Automatically detect URLs in clipboard in the home screen</string>
     <string name="check_clipboard_home">Check clipboard in the home screen</string>
+    <string name="check_clipboard">Check clipboard when the app opens</string>
     <string name="clear_info_json">Clear infojsons</string>
     <string name="internal_plugin_ffmpeg_preset">Internal Plugin FFmpeg Preset</string>
     <string name="internal_plugin_ffmpeg_preset_summary">Preset FFmpeg uses for internal plugins like burn subs etc. Adjusting this preference affects the final file size!</string>
