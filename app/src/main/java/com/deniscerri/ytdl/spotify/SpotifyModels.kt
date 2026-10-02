@@ -19,7 +19,9 @@ data class SpotifyTrackMetadata(
     val title: String,
     val artist: String,
     val artworkUrl: String?,
-    val spotifyUrl: String
+    val spotifyUrl: String,
+    val durationMs: Long? = null,
+    val playlistIndex: Int? = null
 ) {
     val searchQuery: String
         get() = "$artist - $title"
