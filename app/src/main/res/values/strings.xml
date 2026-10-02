@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">smusic</string>
     <string name="worst_quality">Worst quality</string>
     <string name="best_quality">Best quality</string>
     <string name="search">Search</string>
@@ -16,7 +17,7 @@
     <string name="update_ytdl">Update yt-dlp to the new version</string>
     <string name="about">About</string>
     <string name="source_code">Source code</string>
-    <string name="search_hint">Search or insert URL</string>
+    <string name="search_hint">Search for media or paste a link</string>
     <string name="failed_download">Could not download file</string>
     <string name="download_notification_channel_name">File downloads</string>
     <string name="download_notification_channel_description">Notification showing the progress of downloading audio and video files</string>
@@ -76,7 +77,7 @@
     <string name="remove_duplicates">Remove duplicates</string>
     <string name="sort_by">Sorting</string>
     <item type="id" name="cancelDownload"/>
-    <string name="trendingPlaylist" translatable="false">ytdlnis-TRENDING</string>
+    <string name="trendingPlaylist" translatable="false">smusic-TRENDING</string>
     <string name="remove_downloading">Cancel downloads</string>
     <string name="incognito_summary">Download without adding to history</string>
     <string name="configure_download">Adjust download</string>
