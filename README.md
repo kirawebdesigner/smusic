@@ -28,7 +28,7 @@
 </div>
 
 <h3 align="center">
-	YTDLnis is a free and open source video/audio downloader using yt-dlp for Android 7.0 and above.
+	smusic is a free and open source video/audio downloader using yt-dlp for Android 7.0 and above.
 </h3>
 <h4 align="center">
 	Created by Denis Çerri
@@ -54,6 +54,11 @@
 ### Only the links above are the only trusted sources of YTDLnis. Everything else is not related to me.
 
 </div>
+
+
+## smusic distribution
+
+This fork is distributed through [smusic GitHub Releases](https://github.com/kirawebdesigner/smusic/releases). The GitHub repository or a GitHub release URL cannot be added under **F-Droid → Add repository** because F-Droid requires a signed repository index. smusic uses the independent Android package ID `com.kirawebdesigner.smusic` and is installed separately from the F-Droid YTDLnis package.
 
 ## 💡 Features:
 
@@ -145,7 +150,7 @@ Please read the [contributing](CONTRIBUTING.MD) section if you would like to con
 
 ## 🔑 Connect with third-party apps using the package name
 
-The app's package name is "com.deniscerri.ytdl".
+The app's package name is `com.kirawebdesigner.smusic`.
 
 ## 🔍 Verify application signature
 

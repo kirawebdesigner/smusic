@@ -1,0 +1,32 @@
+Categories:
+  - Multimedia
+License: GPL-3.0-only
+AuthorName: kirawebdesigner
+Name: smusic
+Summary: Dark-branded video and audio downloader for Android
+Description: |
+  smusic is an open-source Android video and audio downloader based on yt-dlp.
+  It supports searching, direct links, playlists, queues, audio/video formats,
+  subtitles, metadata, and public Spotify track, album, and playlist links.
+  Spotify links are resolved to artist/title searches and downloaded through
+  the existing yt-dlp media pipeline; smusic does not download audio directly
+  from Spotify.
+WebSite: https://github.com/kirawebdesigner/smusic
+SourceCode: https://github.com/kirawebdesigner/smusic
+IssueTracker: https://github.com/kirawebdesigner/smusic/issues
+Changelog: https://github.com/kirawebdesigner/smusic/releases
+RepoType: git
+Repo: https://github.com/kirawebdesigner/smusic.git
+Builds:
+  - versionName: 1.9.1
+    versionCode: 1090100
+    commit: 4e19c5d8e77a17c3e0c16ea34606f4ce75ba7029
+    subdir: app
+    gradle:
+      - foss
+    output: build/outputs/apk/foss/release/smusic-1.9.1-foss-universal-release.apk
+    scandelete:
+      - app/src/androidTest
+      - app/src/test
+CurrentVersion: 1.9.1
+CurrentVersionCode: 1090100
