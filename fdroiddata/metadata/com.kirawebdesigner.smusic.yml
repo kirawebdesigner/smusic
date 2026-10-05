@@ -18,15 +18,15 @@ Changelog: https://github.com/kirawebdesigner/smusic/releases
 RepoType: git
 Repo: https://github.com/kirawebdesigner/smusic.git
 Builds:
-  - versionName: 1.9.1
-    versionCode: 1090100
-    commit: 4e19c5d8e77a17c3e0c16ea34606f4ce75ba7029
+  - versionName: 1.9.2
+    versionCode: 1090200
+    commit: f740e470ba6c851f26a24c4c42f6c14490168c71
     subdir: app
     gradle:
       - foss
-    output: build/outputs/apk/foss/release/smusic-1.9.1-foss-universal-release.apk
+    output: build/outputs/apk/foss/release/smusic-1.9.2-foss-universal-release.apk
     scandelete:
       - app/src/androidTest
       - app/src/test
-CurrentVersion: 1.9.1
-CurrentVersionCode: 1090100
+CurrentVersion: 1.9.2
+CurrentVersionCode: 1090200
