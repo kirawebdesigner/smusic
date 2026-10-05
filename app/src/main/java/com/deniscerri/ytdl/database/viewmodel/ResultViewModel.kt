@@ -24,6 +24,7 @@ import com.deniscerri.ytdl.database.repository.ResultRepository
 import com.deniscerri.ytdl.database.repository.SearchHistoryRepository
 import com.deniscerri.ytdl.spotify.SpotifyClient
 import com.deniscerri.ytdl.spotify.SpotifyUrlParser
+import com.deniscerri.ytdl.spotify.distinctTracks
 import com.deniscerri.ytdl.util.NotificationUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -194,11 +195,13 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
                     launch(Dispatchers.IO) {
                         requestSemaphore.withPermit {
                             try {
+                                val isSpotifyInput = SpotifyUrlParser.parse(inputQuery) != null
                                 val queries = resolveSpotifyQueries(inputQuery)
                                 queries.forEachIndexed { index, query ->
                                     val results = repository.getResultsFromSource(
                                         query,
-                                        resetResults = resetResults && index == 0
+                                        resetResults = resetResults && index == 0,
+                                        singleItem = isSpotifyInput
                                     )
                                     synchronized(res) { res.addAll(results) }
                                 }
@@ -214,7 +217,13 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
             }
 
             if (currentCoroutineContext().isActive) {
-                onResult(res)
+                val spotifyInput = inputQueries.any { SpotifyUrlParser.parse(it) != null }
+                val finalResults = if (spotifyInput) {
+                    res.filterNotNull().distinctBy { it.url }
+                } else {
+                    res
+                }
+                onResult(finalResults)
             }
 
         } catch (e: CancellationException) {
@@ -233,7 +242,7 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
      */
     private suspend fun resolveSpotifyQueries(inputQuery: String): List<String> {
         val resource = SpotifyUrlParser.parse(inputQuery) ?: return listOf(inputQuery)
-        val metadata = SpotifyClient().resolve(resource)
+        val metadata = SpotifyClient().resolve(resource).distinctTracks()
         return metadata.map { it.searchQuery }
     }
 

@@ -1,7 +1,9 @@
 package com.deniscerri.ytdl
 
 import com.deniscerri.ytdl.spotify.SpotifyResourceType
+import com.deniscerri.ytdl.spotify.SpotifyTrackMetadata
 import com.deniscerri.ytdl.spotify.SpotifyUrlParser
+import com.deniscerri.ytdl.spotify.distinctTracks
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -31,5 +33,23 @@ class SpotifyUrlParserTest {
         assertNull(SpotifyUrlParser.parse("https://youtube.com/watch?v=abc"))
         assertNull(SpotifyUrlParser.parse("https://open.spotify.com/track/short"))
         assertNull(SpotifyUrlParser.parse("not a url"))
+    }
+
+    @Test
+    fun removesRepeatedSpotifyTrackIdsButPreservesDifferentTracks() {
+        fun track(id: String, title: String) = SpotifyTrackMetadata(
+            title = title,
+            artist = "Artist",
+            artworkUrl = null,
+            spotifyUrl = "https://open.spotify.com/track/$id"
+        )
+
+        val tracks = listOf(
+            track("sameTrackId", "First"),
+            track("sameTrackId", "First copy"),
+            track("otherTrack", "Other")
+        )
+
+        assertEquals(listOf("First", "Other"), tracks.distinctTracks().map { it.title })
     }
 }

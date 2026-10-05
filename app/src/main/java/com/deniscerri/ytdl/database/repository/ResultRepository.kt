@@ -107,7 +107,7 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
             .getOrDefault(Pair(listOf(""), null))
     }
 
-    suspend fun search(inputQuery: String, resetResults: Boolean, addToResults: Boolean) : List<ResultItem>{
+    suspend fun search(inputQuery: String, resetResults: Boolean, addToResults: Boolean, singleItem: Boolean = false) : List<ResultItem>{
         if (resetResults) deleteAll()
         val res = when(sharedPreferences.getString("search_engine", "ytsearch")) {
             "ytsearch" -> newPipeUtil.search(inputQuery)
@@ -123,14 +123,15 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
         }
 
         currentCoroutineContext().ensureActive()
-        itemCount.value = items.size
+        val selectedItems = if (singleItem) items.take(1) else items
+        itemCount.value = selectedItems.size
         if (addToResults){
-            val ids = resultDao.insertMultiple(items)
+            val ids = resultDao.insertMultiple(selectedItems)
             ids.forEachIndexed { index, id ->
-                items[index].id = id
+                selectedItems[index].id = id
             }
         }
-        return items
+        return selectedItems
     }
 
     private suspend fun getYoutubeWatchVideos(inputQuery: String, resetResults: Boolean, addToResults: Boolean) : List<ResultItem> {
@@ -438,7 +439,7 @@ class ResultRepository(private val resultDao: ResultDao, commandTemplateDao: Com
                 }
             }
             SourceType.SEARCH_QUERY -> {
-                search(inputQuery, resetResults, addToResults)
+                search(inputQuery, resetResults, addToResults, singleItem)
             }
             SourceType.YT_DLP -> {
                 getFromYTDLP(inputQuery, resetResults, addToResults, singleItem)
