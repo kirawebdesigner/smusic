@@ -25,4 +25,15 @@ data class SpotifyTrackMetadata(
 ) {
     val searchQuery: String
         get() = "$artist - $title"
+
+    /** Prefer the Spotify track ID; fall back to normalized metadata if a payload omits it. */
+    val uniqueKey: String
+        get() = spotifyUrl.substringAfterLast("/track/", "")
+            .substringBefore('?')
+            .takeIf { it.isNotBlank() && it != spotifyUrl }
+            ?.let { "spotify:$it" }
+            ?: "metadata:${artist.trim().lowercase()}\u0000${title.trim().lowercase()}"
 }
+
+fun List<SpotifyTrackMetadata>.distinctTracks(): List<SpotifyTrackMetadata> =
+    distinctBy { it.uniqueKey }

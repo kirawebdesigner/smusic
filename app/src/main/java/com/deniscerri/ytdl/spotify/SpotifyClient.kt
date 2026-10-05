@@ -86,7 +86,7 @@ class SpotifyClient(
                 durationMs = track["duration"]?.jsonPrimitive?.longOrNull,
                 playlistIndex = index + 1
             )
-        }
+        }.distinctTracks()
     }
 
     private fun trackFromEntity(entity: JsonObject, originalUrl: String, index: Int?): SpotifyTrackMetadata {
