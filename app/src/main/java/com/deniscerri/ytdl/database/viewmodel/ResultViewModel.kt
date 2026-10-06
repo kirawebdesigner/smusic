@@ -23,6 +23,7 @@ import com.deniscerri.ytdl.database.models.SearchHistoryItem
 import com.deniscerri.ytdl.database.repository.ResultRepository
 import com.deniscerri.ytdl.database.repository.SearchHistoryRepository
 import com.deniscerri.ytdl.spotify.SpotifyClient
+import com.deniscerri.ytdl.spotify.SpotifyResourceType
 import com.deniscerri.ytdl.spotify.SpotifyUrlParser
 import com.deniscerri.ytdl.spotify.distinctTracks
 import com.deniscerri.ytdl.util.NotificationUtil
@@ -57,6 +58,7 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
     val repository : ResultRepository
     private val searchHistoryRepository : SearchHistoryRepository
     val playlistFilter = MutableStateFlow("")
+    val spotifyPlaylistInput = MutableStateFlow(false)
 
     var paginatedItems : Flow<PagingData<ResultItem>>
     var totalCount = MutableStateFlow(0)
@@ -180,6 +182,9 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private suspend fun parseQueriesImpl(inputQueries: List<String>, onResult: (list: List<ResultItem?>) -> Unit) {
+        spotifyPlaylistInput.value = inputQueries.size == 1 && inputQueries.firstOrNull()
+            ?.let { SpotifyUrlParser.parse(it)?.type == SpotifyResourceType.PLAYLIST }
+            == true
         if (inputQueries.size > 1){
             repository.itemCount.value = inputQueries.size
         }
