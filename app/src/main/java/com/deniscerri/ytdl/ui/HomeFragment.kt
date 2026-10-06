@@ -218,7 +218,8 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
 
                 progressBar.isVisible = loadingItems && size > 0
                 if(resultViewModel.repository.itemCount.value > 1 || resultViewModel.repository.itemCount.value == -1){
-                    showDownloadAllFab = size > 1 && firstResult!!.playlistTitle.isNotEmpty() && !loadingItems
+                    showDownloadAllFab = size > 1 && !loadingItems &&
+                        (firstResult!!.playlistTitle.isNotEmpty() || resultViewModel.spotifyPlaylistInput.value)
                     downloadAllFab!!.isVisible = showDownloadAllFab
                 }else if (resultViewModel.repository.itemCount.value == 1){
                     if (sharedPreferences!!.getBoolean("download_card", true)){
@@ -349,7 +350,8 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
                         shimmerCards!!.stopShimmer()
                         shimmerCards!!.visibility = GONE
 
-                        showDownloadAllFab = totalCount > 1 && firstResult?.playlistTitle.orEmpty().isNotEmpty()
+                        showDownloadAllFab = totalCount > 1 &&
+                            (firstResult?.playlistTitle.orEmpty().isNotEmpty() || resultViewModel.spotifyPlaylistInput.value)
                         downloadAllFab!!.isVisible = showDownloadAllFab
                     }
                 }

@@ -29,6 +29,15 @@ class SpotifyUrlParserTest {
     }
 
     @Test
+    fun recognizesPlaylistLinksForBulkDownload() {
+        val resource = SpotifyUrlParser.parse(
+            "https://open.spotify.com/playlist/3zV94027chLdU92Hrp4LO6?si=tracking"
+        )
+
+        assertEquals(SpotifyResourceType.PLAYLIST, resource?.type)
+    }
+
+    @Test
     fun rejectsNonSpotifyAndMalformedUrls() {
         assertNull(SpotifyUrlParser.parse("https://youtube.com/watch?v=abc"))
         assertNull(SpotifyUrlParser.parse("https://open.spotify.com/track/short"))
