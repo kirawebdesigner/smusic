@@ -182,9 +182,10 @@ class ResultViewModel(private val application: Application) : AndroidViewModel(a
     }
 
     private suspend fun parseQueriesImpl(inputQueries: List<String>, onResult: (list: List<ResultItem?>) -> Unit) {
-        spotifyPlaylistInput.value = inputQueries.size == 1 && inputQueries.firstOrNull()
-            ?.let { SpotifyUrlParser.parse(it)?.type == SpotifyResourceType.PLAYLIST }
-            == true
+        spotifyPlaylistInput.value = inputQueries.size == 1 &&
+            (inputQueries.firstOrNull()?.let {
+                SpotifyUrlParser.parse(it)?.type == SpotifyResourceType.PLAYLIST
+            } == true)
         if (inputQueries.size > 1){
             repository.itemCount.value = inputQueries.size
         }
