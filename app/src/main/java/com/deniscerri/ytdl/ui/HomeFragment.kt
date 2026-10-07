@@ -27,6 +27,7 @@ import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -96,6 +97,10 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
     private var downloadSelectedFab: ExtendedFloatingActionButton? = null
     private var downloadAllFab: ExtendedFloatingActionButton? = null
     private var clipboardFab: ExtendedFloatingActionButton? = null
+    private var spotifyPlaylistPanel: View? = null
+    private var spotifyPlaylistCount: TextView? = null
+    private var spotifySelectAllButton: MaterialButton? = null
+    private var spotifyDownloadAllButton: MaterialButton? = null
     private var homeFabs: LinearLayout? = null
     private var notificationUtil: NotificationUtil? = null
     private var downloadQueue: ArrayList<ResultItem>? = null
@@ -171,6 +176,16 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         downloadSelectedFab = homeFabs!!.findViewById(R.id.download_selected_fab)
         downloadAllFab = homeFabs!!.findViewById(R.id.download_all_fab)
         clipboardFab = homeFabs!!.findViewById(R.id.copied_url_fab)
+        spotifyPlaylistPanel = view.findViewById(R.id.spotify_playlist_panel)
+        spotifyPlaylistCount = view.findViewById(R.id.spotify_playlist_count)
+        spotifySelectAllButton = view.findViewById(R.id.spotify_select_all_button)
+        spotifyDownloadAllButton = view.findViewById(R.id.spotify_download_all_button)
+        spotifySelectAllButton?.setOnClickListener {
+            homeAdapter.checkAll()
+            spotifySelectAllButton?.isEnabled = false
+            spotifyPlaylistCount?.text = getString(R.string.spotify_playlist_count, totalCount)
+        }
+        spotifyDownloadAllButton?.setOnClickListener { downloadAllResults() }
         playlistNameFilterScrollView = view.findViewById(R.id.playlist_selection_chips_scrollview)
         playlistNameFilterChipGroup = view.findViewById(R.id.playlist_selection_chips)
 
@@ -217,6 +232,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
                 val firstResult = resultViewModel.firstResult.value;
 
                 progressBar.isVisible = loadingItems && size > 0
+                updateSpotifyPlaylistPanel(size, loadingItems)
                 if(resultViewModel.repository.itemCount.value > 1 || resultViewModel.repository.itemCount.value == -1){
                     showDownloadAllFab = size > 1 && !loadingItems &&
                         (firstResult!!.playlistTitle.isNotEmpty() || resultViewModel.spotifyPlaylistInput.value)
@@ -241,6 +257,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         lifecycleScope.launch {
             resultViewModel.totalCount.collectLatest {
                 totalCount = it
+                updateSpotifyPlaylistPanel(it, loadingItems)
             }
         }
 
@@ -570,6 +587,7 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
                     showDownloadAllFab = false
                     downloadAllFab!!.visibility = GONE
                     downloadSelectedFab!!.visibility = GONE
+                    spotifyPlaylistPanel?.visibility = GONE
                 }
                 R.id.delete_search -> {
                     resultViewModel.deleteAllSearchQueryHistory()
@@ -839,20 +857,37 @@ class HomeFragment : Fragment(), HomeAdapter.OnItemClickListener, SearchSuggesti
         } catch (e: Exception) {""}
         if (viewIdName.isNotEmpty()) {
             if (viewIdName == "downloadAll") {
-                val showDownloadCard = sharedPreferences!!.getBoolean("download_card", true)
+                downloadAllResults()
+            }
+        }
+    }
 
-                lifecycleScope.launch {
-                    val resultIds = withContext(Dispatchers.IO) {
-                        resultViewModel.getAllIds()
-                    }
+    private fun updateSpotifyPlaylistPanel(count: Int, loading: Boolean) {
+        val isSpotifyPlaylist = resultViewModel.spotifyPlaylistInput.value
+        val showPanel = isSpotifyPlaylist && (loading || count > 0)
+        spotifyPlaylistPanel?.isVisible = showPanel
+        if (!showPanel) return
 
-                    downloadViewModel.turnResultItemsToProcessingDownloads(resultIds, downloadNow = !showDownloadCard)
-                    if (showDownloadCard){
-                        findNavController().navigate(R.id.downloadMultipleBottomSheetDialog2)
-                    }
-                }
+        spotifyPlaylistCount?.text = if (loading) {
+            getString(R.string.spotify_playlist_ready)
+        } else {
+            getString(R.string.spotify_playlist_count, count)
+        }
+        spotifySelectAllButton?.isEnabled = !loading && count > 0
+        spotifyDownloadAllButton?.isEnabled = !loading && count > 0
+    }
 
-
+    private fun downloadAllResults() {
+        val showDownloadCard = sharedPreferences!!.getBoolean("download_card", true)
+        lifecycleScope.launch {
+            val resultIds = withContext(Dispatchers.IO) { resultViewModel.getAllIds() }
+            if (resultIds.isEmpty()) return@launch
+            downloadViewModel.turnResultItemsToProcessingDownloads(
+                resultIds,
+                downloadNow = !showDownloadCard
+            )
+            if (showDownloadCard) {
+                findNavController().navigate(R.id.downloadMultipleBottomSheetDialog2)
             }
         }
     }
