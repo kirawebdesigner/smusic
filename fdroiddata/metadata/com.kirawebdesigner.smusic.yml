@@ -20,7 +20,7 @@ Repo: https://github.com/kirawebdesigner/smusic.git
 Builds:
   - versionName: 1.9.4
     versionCode: 1090400
-    commit: 5133017aaf4c9fae92dd32903c5496163940e91f
+    commit: a67c95b984f803a1bcf9ac6ac8eeffa5b98e5a6a
     subdir: app
     gradle:
       - foss
