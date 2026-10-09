@@ -32,18 +32,25 @@ jobs:
         with:
           packages: "platform-tools platforms;android-36 build-tools;36.0.0"
 
-      - name: Create temporary release signing key
+      - name: Configure permanent release signing
+        env:
+          SMUSIC_KEYSTORE_BASE64: ${{ secrets.SMUSIC_KEYSTORE_BASE64 }}
+          SMUSIC_KEYSTORE_PASSWORD: ${{ secrets.SMUSIC_KEYSTORE_PASSWORD }}
+          SMUSIC_KEY_ALIAS: ${{ secrets.SMUSIC_KEY_ALIAS }}
+          SMUSIC_KEY_PASSWORD: ${{ secrets.SMUSIC_KEY_PASSWORD }}
         run: |
-          keytool -genkeypair -v \
-            -keystore "$GITHUB_WORKSPACE/smusic-release.keystore" \
-            -storepass smusic-release -keypass smusic-release \
-            -alias smusic -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=smusic, OU=smusic, O=smusic, L=Unknown, S=Unknown, C=US"
+          test -n "$SMUSIC_KEYSTORE_BASE64" || { echo 'Missing SMUSIC_KEYSTORE_BASE64'; exit 1; }
+          test -n "$SMUSIC_KEYSTORE_PASSWORD" || { echo 'Missing SMUSIC_KEYSTORE_PASSWORD'; exit 1; }
+          test -n "$SMUSIC_KEY_ALIAS" || { echo 'Missing SMUSIC_KEY_ALIAS'; exit 1; }
+          test -n "$SMUSIC_KEY_PASSWORD" || { echo 'Missing SMUSIC_KEY_PASSWORD'; exit 1; }
+          printf '%s' "$SMUSIC_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/smusic-release.keystore"
+          keytool -list -keystore "$GITHUB_WORKSPACE/smusic-release.keystore" \
+            -storepass "$SMUSIC_KEYSTORE_PASSWORD" -alias "$SMUSIC_KEY_ALIAS" >/dev/null
           cat > keystore.properties <<EOF
           signingConfig.storeFile=$GITHUB_WORKSPACE/smusic-release.keystore
-          signingConfig.storePassword=smusic-release
-          signingConfig.keyAlias=smusic
-          signingConfig.keyPassword=smusic-release
+          signingConfig.storePassword=$SMUSIC_KEYSTORE_PASSWORD
+          signingConfig.keyAlias=$SMUSIC_KEY_ALIAS
+          signingConfig.keyPassword=$SMUSIC_KEY_PASSWORD
           EOF
           touch local.properties
           chmod +x gradlew
