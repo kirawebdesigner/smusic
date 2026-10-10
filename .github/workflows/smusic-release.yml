@@ -43,7 +43,9 @@ jobs:
           test -n "$SMUSIC_KEYSTORE_PASSWORD" || { echo 'Missing SMUSIC_KEYSTORE_PASSWORD'; exit 1; }
           test -n "$SMUSIC_KEY_ALIAS" || { echo 'Missing SMUSIC_KEY_ALIAS'; exit 1; }
           test -n "$SMUSIC_KEY_PASSWORD" || { echo 'Missing SMUSIC_KEY_PASSWORD'; exit 1; }
-          printf '%s' "$SMUSIC_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/smusic-release.keystore"
+          keystore_b64="${SMUSIC_KEYSTORE_BASE64#SMUSIC_KEYSTORE_BASE64=}"
+          keystore_b64="$(printf '%s' "$keystore_b64" | tr -d '[:space:]')"
+          printf '%s' "$keystore_b64" | base64 --decode > "$GITHUB_WORKSPACE/smusic-release.keystore"
           keytool -list -keystore "$GITHUB_WORKSPACE/smusic-release.keystore" \
             -storepass "$SMUSIC_KEYSTORE_PASSWORD" -alias "$SMUSIC_KEY_ALIAS" >/dev/null
           cat > keystore.properties <<EOF
