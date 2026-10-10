@@ -43,9 +43,16 @@ jobs:
           test -n "$SMUSIC_KEYSTORE_PASSWORD" || { echo 'Missing SMUSIC_KEYSTORE_PASSWORD'; exit 1; }
           test -n "$SMUSIC_KEY_ALIAS" || { echo 'Missing SMUSIC_KEY_ALIAS'; exit 1; }
           test -n "$SMUSIC_KEY_PASSWORD" || { echo 'Missing SMUSIC_KEY_PASSWORD'; exit 1; }
-          keystore_b64="${SMUSIC_KEYSTORE_BASE64#SMUSIC_KEYSTORE_BASE64=}"
-          keystore_b64="$(printf '%s' "$keystore_b64" | tr -d '[:space:]')"
-          printf '%s' "$keystore_b64" | base64 --decode > "$GITHUB_WORKSPACE/smusic-release.keystore"
+          python3 - <<'PY'
+          import base64, os
+          value = os.environ['SMUSIC_KEYSTORE_BASE64']
+          if value.startswith('SMUSIC_KEYSTORE_BASE64='):
+              value = value.split('=', 1)[1]
+          value = ''.join(value.split())
+          value += '=' * (-len(value) % 4)
+          with open(os.path.join(os.environ['GITHUB_WORKSPACE'], 'smusic-release.keystore'), 'wb') as output:
+              output.write(base64.b64decode(value, validate=False))
+          PY
           keytool -list -keystore "$GITHUB_WORKSPACE/smusic-release.keystore" \
             -storepass "$SMUSIC_KEYSTORE_PASSWORD" -alias "$SMUSIC_KEY_ALIAS" >/dev/null
           cat > keystore.properties <<EOF
